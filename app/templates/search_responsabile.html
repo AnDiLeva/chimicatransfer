@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<title>Ricerca Inventario per responsabile</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css" />
+</head>
+<body>
+<section class="section">
+
+  {% include "menu.html" %}
+
+  <div class="container">
+
+
+<br><br>
+
+<h1 class="title is-4">Filtra per Responsabile Oggetto</h1>
+
+
+<div class="content">
+<ul>
+
+<li><a href="/chimicatransfer/search?responsabile_strumento=SENZA">Senza responsabile</a></li>
+<br>
+
+{% for r in resp %}
+<li><a href="/chimicatransfer/search?responsabile_strumento={{ r.responsabile_strumento }}">{{ r.responsabile_strumento }}</a></li>
+{% endfor %}
+</ul>
+</div>
+
+{#<!--
+<form method="get" action="/chimicatransfer/search">
+  <div class="field">
+    <label class="label">Responsabile Laboratorio</label>
+    <div class="control">
+      <div class="select">
+        <select name="responsabile_laboratorio"  onchange="this.form.submit()">
+          <option value="SENZA">Senza responsabile</option>
+          {% for r in resp %}
+          <option value="{{ r.responsabile_laboratorio }}">{{ r.responsabile_laboratorio }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="control">
+    <button type="submit" class="button is-link">Filtra</button>
+  </div>
+</form>
+-->#}
+
+</div>
+</section>
+</body>
+</html>

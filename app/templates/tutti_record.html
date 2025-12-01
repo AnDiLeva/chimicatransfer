@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Chimica Transfer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+</head>
+<body>
+<section class="section">
+  {% include "menu.html" %}
+
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+    <div class="notification is-{{ category }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
+<p class="subtitle is-5 mt-5">Numero totale beni: <b>{{ records|length }}</b></p>
+
+<style>
+.table-container {
+  max-height: 80vh; /* oppure 100vh meno eventuali header/footer */
+  overflow-y: auto;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  color: #ffffff;
+  background: #111111;
+  z-index: 2;
+}
+
+/* opzionale: bordi sopra/sotto header */
+.table thead {
+  border-bottom: 2px solid #ddd;
+}
+.emoji {
+      cursor: pointer;
+    }
+</style>
+
+
+  {% include "table.html" %}
+
+
+
+</section>
+
+</body>
+</html>
+

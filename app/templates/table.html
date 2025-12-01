@@ -1,0 +1,116 @@
+<style>
+.table-container {
+  max-height: 80vh; /* oppure 100vh meno eventuali header/footer */
+  overflow-y: auto;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  color: #ffffff;
+  background: #111111;
+  z-index: 2;
+}
+
+/* opzionale: bordi sopra/sotto header */
+.table thead {
+  border-bottom: 2px solid #ddd;
+}
+.emoji {
+      cursor: pointer;
+    }
+</style>
+
+
+<div class="table-container">
+  {{"table.html"}}
+<table class="table is-striped is-fullwidth">
+<thead>
+<tr>
+<!-- <th><input type="checkbox" id="select_all" /></th> -->
+{% for field in columns %}
+{% if field not in ['da_movimentare', 'catena_del_freddo', 'collegamento_autonomia', 'difficolta','trasporto_in_autonomia', 'microscopia', 'alta_specialistica', 'peso_numeric', 'dimensioni_ok'] %}
+
+<th>{{ field.replace('_', ' ') }}</th>
+{% if field in ['Responsabile Laboratorio / Ufficio', 'ID'] %}<th></th>{%endif%}
+{% endif %}
+{% endfor %}
+<th>Azioni</th>
+</tr>
+</thead>
+<tbody>
+{% for r in records %}
+<tr>
+<!-- <td><input type="checkbox" name="record_ids" value="{{ r['ID'] }}" form="form_modifica_multipla"></td> -->
+<td> {{ r['ID'] }}</td>
+<td>{% if not r.peso_numeric or not r.dimensioni_ok %}
+  <span class="emoji" title="Verificare il peso e/o le dimensioni">⚠️</span>
+  
+  {%endif%}</td>
+<!-- <td>{{ r['ID EXCEL'] }}</td> -->
+<td>{{ r['Indirizzo'] }}</td>
+<td>{{ r['Piano'] }}</td>
+<td>{{ r['Codice SIPI Torino'] }}</td>
+<td>{{ r['Nome Strumentazione'] }}</td>
+<td>{{ r['Responsabile'] }}</td>
+<!-- <td>{% if r.collegamento_autonomia is true %}<span class="emoji" title="collegamento in autonomia">🟩</span>{% endif %}</td>
+<td>{% if r.difficolta is true %}<span class="emoji" title="Difficoltà">🟩</span>{% endif %}</td> -->
+<td>
+  {% if r.collegamento_autonomia == 'Si' %}<span class="emoji" title="collegamento in autonomia">❌</span>
+  {% elif r.collegamento_autonomia == 'No' %}
+<span class="emoji" title="Collegamento da parte di Ditta">⚡</span>
+  {% else%}
+<span class="emoji" title="Collegamento non compilato">❔</span>
+{% endif %}
+  {{ r['Ditta che si occupa del collegamento'] }}
+</td>
+<td>
+   {% if r.Delicatezza  == "1" %} <p>Non Delicato</p>
+  {% elif r.Delicatezza  == "2" %}<p>Delicato</p>
+    {% else%} <p>Estremamente Delicato</p>
+    {% endif %}
+</td>
+<td>
+  {% if r.difficolta  == 'Si' %}<span class="emoji" title="Difficoltà">🟥</span>
+  {% elif r.difficolta  == 'No' %}
+<span class="emoji" title="Nessuna Difficoltà">🟩</span>
+  {% else%}
+<span class="emoji" title="Difficoltà non compilata">🟨</span>
+{% endif %}
+  {{ r['Quale difficoltà'] }}</td>
+<td>{{ r['Simil Sipi Grugliasco'] }}</td>
+
+
+<!-- <td>{% if r.da_movimentare is true %}
+<span class="emoji" title="Da movimentare">🟩</span>
+{% elif r.da_movimentare is false %}
+<span class="emoji" title="Strumento/bene da non movimentare/dismettere">🟥</span>
+{% endif %}
+{% if r.catena_del_freddo is true %}<span class="emoji" title="Rispettare la catena del freddo">❄️</span>{% endif %}
+{% if r.trasporto_in_autonomia is true %}<span class="emoji" title="Trasporto in autonomia">🚗</span>{% endif %}
+{% if r.microscopia is true %}<span class="emoji" title="Microscopia">🔬</span>{% endif %}
+{% if r.alta_specialistica is true %}<span class="emoji" title="Alta specialistica">⚙️</span>{% endif %}
+</td> -->
+<!-- <td>{{ r.Destinazione }}</td> -->
+
+
+{# <td>{{ r['Note'] }}</td> #}
+<td>{{ r['Note'].replace('\r', '<br>') | safe }}</td>
+<td>
+<a class="button is-small is-info" href="{{ url_for('view', record_id=r['ID'], query_string=query_string) }}">dettagli</a>
+ {% if session['email'] %}
+<a class="button is-small is-warning" href="{{ url_for('modifica', record_id=r['ID'], query_string=query_string) }}">Modifica</a>
+<a class="button is-small is-warning" href="{{ url_for('duplica', record_id=r['ID'], query_string=query_string) }}">Duplica</a>
+<form method="post" action="{{ url_for('delete_record', record_id=r['ID'], query_string=query_string) }}" style="display:inline;" onsubmit="return confirm('Sei sicuro di voler eliminare questo record?');">
+<button class="button is-small is-danger" type="submit">Elimina</button>
+{% endif %}
+</form>
+
+<!-- <a class="button is-small" href="{{ url_for('etichetta', record_id=r['ID']) }}">Etichetta</a> -->
+
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>{# table-container #}

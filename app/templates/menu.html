@@ -1,0 +1,42 @@
+<!-- Header con Navbar -->
+<nav class="navbar is-danger" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="{{ url_for('index') }}">
+        <h3 class="title is-3">CHIMICA-GRUGLIASCO</h3>
+    </a>
+
+    <!-- Burger per mobile -->
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="mainNavbar">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div id="mainNavbar" class="navbar-menu">
+    <div class="navbar-start">
+       <!-- {% if session['email'] %}
+      <a class="navbar-item" href="{{ url_for('aggiungi') }}">Aggiungi nuovo bene</a>
+       {% endif %} -->
+      <a class="navbar-item" href="{{ url_for('search') }}">Cerca</a>
+
+
+      <!-- Dropdown -->
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">Filtra</a>
+        <div class="navbar-dropdown">
+          <a class="navbar-item" href="{{ url_for('search_resp') }}">per responsabile / referente</a>
+          <a class="navbar-item" href="{{ url_for('search_sipi_torino') }}" >per codici SIPI Torino</a>
+          <a class="navbar-item" href="{{ url_for('search_struttura') }}" >per struttura</a>
+          <!--<hr class="navbar-divider">
+          <a class="navbar-item">Supporto</a>-->
+        </div>
+      </div>
+
+      <a class="navbar-item" href="{{ url_for('mappe') }}">Planimetrie con codici SIPI</a>
+
+      <a class="navbar-item" href="{{ url_for('tutti') }}">Visualizza tutti beni</a><br>
+
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Visualizza Bene (ID: {{ record.id }})</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+</head>
+<body>
+<section class="section">
+{% include "menu.html" %}
+<div class="container">
+
+<br><br>
+
+<div class="field is-grouped">
+
+<a href="javascript:history.back()" class="button is-link">Indietro</a>
+
+
+<!-- <a class="button is-warning" href="{{ url_for('etichetta', record_id=record.ID) }}">Stampa etichetta</a> -->
+
+</div>
+<br>
+<h1 class="title">{{ record['Nome Strumento'] }}</h1>
+
+<table class="table is-striped is-hoverable is-fullwidth">
+<tbody>
+{% for key, value in record.items()  if key != 'Nome Strumento' %}
+<tr>
+<th>{{ key.replace('_', ' ') }}</th>
+<td>
+{% if key == 'Responsabile del laboratorio/ufficio' %}
+<a href="/chimicatransfer/search?responsabile_strumento={{ value }}">{{ value }}</a>
+{% elif key == 'Codice SIPI Torino' %}
+<a href="/chimicatransfer/search?codice_sipi_torino={{ value }}">{{ value }}</a>
+{% else %}
+{{ value }}
+{% endif %}
+</td>
+</tr>
+{% endfor %}
+    
+</tbody>
+</table>
+
+{% if img_list %}
+<h2 class="title">Documentazione fotografica</h2>
+{% for img in img_list %}
+
+<a href="/app/static/images/{{ img }}"><img src="/app/static/images/{{ img }}" width="200px"></a>
+
+{% endfor %}
+
+{% endif %}
+
+
+</div>
+</section>
+
+</body>
+</html>
