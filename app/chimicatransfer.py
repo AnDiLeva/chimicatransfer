@@ -31,7 +31,7 @@ __version__ = "2025-09-26 09:46"
 
 APP_ROOT = "/chimicatransfer"
 
-app = Flask(__name__, static_url_path="/app/static")
+app = Flask(__name__, static_url_path="/chimicatransfer/static", static_folder="static")
 app.secret_key = "sldjhalsdasd2435"  # needed for flash messages
 
 
