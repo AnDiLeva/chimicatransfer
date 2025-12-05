@@ -29,8 +29,11 @@
 <!-- <th><input type="checkbox" id="select_all" /></th> -->
 {% for field in columns %}
 {% if field not in ['da_movimentare', 'catena_del_freddo', 'collegamento_autonomia', 'difficolta','trasporto_in_autonomia', 'microscopia', 'alta_specialistica', 'peso_numeric', 'dimensioni_ok'] %}
-
+{% if field == 'Quale difficoltà' %}
+<th style="text-align: end;">{{ field.replace('_', ' ') }}</th>
+{%else%}
 <th>{{ field.replace('_', ' ') }}</th>
+{%endif%}
 {% if field in ['Responsabile Laboratorio / Ufficio', 'ID'] %}<th></th>{%endif%}
 {% endif %}
 {% endfor %}
@@ -74,14 +77,15 @@
     {% else%} <p>Estremamente Delicato</p>
     {% endif %}
 </td>
-<td>
+<td style="text-align: end;">
   {% if r.difficolta  == 'Si' %}<span class="emoji" title="Difficoltà">🟥</span>
   {% elif r.difficolta  == 'No' %}
 <span class="emoji" title="Nessuna Difficoltà">🟩</span>
   {% else%}
 <span class="emoji" title="Difficoltà non compilata">🟨</span>
 {% endif %}
-  {{ r['Quale difficoltà'] }}</td>
+  {{ r['Quale difficoltà'] }}
+</td>
 <td>{{ r['Simil Sipi Grugliasco'] }}</td>
 
 

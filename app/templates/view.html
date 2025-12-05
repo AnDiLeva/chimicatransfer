@@ -16,7 +16,6 @@
 
 <a href="javascript:history.back()" class="button is-link">Indietro</a>
 
-
 <!-- <a class="button is-warning" href="{{ url_for('etichetta', record_id=record.ID) }}">Stampa etichetta</a> -->
 </div>
 <br>
@@ -36,6 +35,8 @@
 <a href="/chimicatransfer/search?responsabile_strumento={{ value }}">{{ value }}</a>
 {% elif key == 'Codice SIPI Torino' %}
 <a href="/chimicatransfer/search?codice_sipi_torino={{ value }}">{{ value }}</a>
+{% elif key == 'Codice SIPI Grugliasco' %}
+<a href="/chimicatransfer/search?codice_sipi_grugliasco={{ value }}">{{ value }}</a>
 {% else %}
 {% if value == 'Via Pietro Giuria 01' %}
 {{'Via Pietro Giuria 1'}}

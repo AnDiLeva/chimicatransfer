@@ -5,13 +5,19 @@
         <h3 class="title is-3">CHIMICA-GRUGLIASCO</h3>
     </a>
 
-    <!-- Burger per mobile -->
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="mainNavbar">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-  </div>
+        <!-- Burger per mobile -->
+        <a
+            role="button"
+            class="navbar-burger"
+            aria-label="menu"
+            aria-expanded="false"
+            data-target="mainNavbar"
+        >
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
 
   <div id="mainNavbar" class="navbar-menu">
     <div class="navbar-start">
@@ -27,6 +33,7 @@
         <div class="navbar-dropdown">
           <a class="navbar-item" href="{{ url_for('search_resp') }}">per responsabile / referente</a>
           <a class="navbar-item" href="{{ url_for('search_sipi_torino') }}" >per codici SIPI Torino</a>
+          <a class="navbar-item" href="{{ url_for('search_sipi_grugliasco') }}" >per codici SIPI Grugliasco</a>
           <a class="navbar-item" href="{{ url_for('search_struttura') }}" >per struttura</a>
           <!--<hr class="navbar-divider">
           <a class="navbar-item">Supporto</a>-->
@@ -40,3 +47,17 @@
     </div>
   </div>
 </nav>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Seleziona il burger e il menu target
+        const burger = document.querySelector(".navbar-burger");
+        const menu = document.getElementById(burger.dataset.target);
+
+        // Aggiungi un listener per il click
+        burger.addEventListener("click", () => {
+            burger.classList.toggle("is-active");
+            menu.classList.toggle("is-active");
+        });
+    });
+</script>

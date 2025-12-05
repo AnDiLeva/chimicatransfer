@@ -189,7 +189,7 @@ def tutti():
             )
         )
         records = result.fetchall()
-        print("table results", result.keys())
+        #print("table results", result.keys())
     return render_template(
         "tutti_record.html",
         records=records,
@@ -250,7 +250,7 @@ def view(record_id: int, query_string: str = ""):
         img_list = [
             x.name for x in list(Path(app.config["UPLOAD_FOLDER"]).glob("*_*.*"))
         ]
-        print("table results", record_dict)
+        #print("table results", record_dict)
 
     return render_template(
         "view.html", record=record_dict, query_string=query_string, img_list=img_list
@@ -952,11 +952,11 @@ def search():
                     #     query += f" AND {field} = :{field}"
                     # else:
                     query += f" AND {field} ILIKE :{field}"
-                    print(request.args.get(field))
+                    #print(request.args.get(field))
                     params[field] = f"%{value}%"
 
         query += " ORDER BY id ASC"
-        print("query: ",query)
+        #print("query: ",query)
         
         sql = text(query)
         with engine.connect() as conn:
@@ -991,77 +991,47 @@ def search():
         columns=keys,
     )
 
-@app.route(APP_ROOT + "/otherlocation", methods=["GET"])
-# @check_login
-def searchotherlocation():
-    # Lista di tutti i campi su cui cercare
-    fields = [
-        # "descrizione_inventario",
-        "responsabile_strumento",
-        "codice_sipi_torino",
-        "codice_sipi_grugliasco",
-        "collegamento_autonomia",
-        "ditta_collegamento",
-        "delicatezza",
-        "difficolta",
-        "indirizzo",
-        "piano",
-        "nome_strumento",
-        "note",
-    ]
-
-    query_string = request.query_string.decode("utf-8")
-
-    query = (
-        'SELECT id AS "ID", indirizzo AS "Indirizzo", piano AS "Piano",'
-        ' nome_strumento AS "Nome Strumentazione", responsabile_strumento AS "Responsabile",'
-        ' codice_sipi_torino AS "Codice SIPI Torino", codice_sipi_grugliasco AS "Codice SIPI Grugliasco",'
-        ' note AS "Note",'
-        "(peso = '' OR peso ~ '^-?[0-9]+(\.[0-9]+)?$')  AS peso_numeric, "
-        "(dimensioni = '' OR dimensioni ~ '^[0-9]+x[0-9]+x[0-9]+$') AS dimensioni_ok " 
-        "FROM inventario WHERE deleted IS NULL " 
-        "AND indirizzo ILIKE '%ungheria%' or indirizzo ilike '%fisica%'"
-        )
-    # params = {}
-    # #print('fields: ', fields)
-    # for field in fields:
-    #     if field in BOOLEAN_FIELDS:
-    #         if not request.args.get(field, ""):
-    #             continue
-    #         value = request.args.get(field, "") == "true"
-    #         query += f" AND {field} IS {value}"
-    #     else:
-    #         value = request.args.get(field, "").strip()
-    #         if value:
-    #             # Per testo, ricerca con ILIKE e wildcard %
-    #             # if field == "piano":
-    #             #     query += f" AND {field} = :{field}"
-    #             # else:
-    #             query += f" AND {field} ILIKE :{field}"
-                
-    #             params[field] = f"%{value}%"
-
-    query += " ORDER BY id ASC"
-    print("query: ",query)
-    
-    sql = text(query)
-    print("hey")
-    with engine.connect() as conn:
-        result = conn.execute(sql)
-        records = result.fetchall()
-        keys = result.keys()
-        # print("search keys", (keys))
-        # print("search records", records[0])
-
-    return render_template(
-        "search.html",
-        records=records,
-        request_args=request.args,
-        fields=fields,
-        query_string=query_string,
-        boolean_fields=BOOLEAN_FIELDS,
-        columns=keys,
-    )
+# @app.route(APP_ROOT + "/otherlocation", methods=["GET"])
+# def searchotherlocation():
+#     fields = [
+#         "responsabile_strumento",
+#         "codice_sipi_torino",
+#         "codice_sipi_grugliasco",
+#         "collegamento_autonomia",
+#         "ditta_collegamento",
+#         "delicatezza",
+#         "difficolta",
+#         "indirizzo",
+#         "piano",
+#         "nome_strumento",
+#         "categoria",
+#     ]
+#     query_string = request.query_string.decode("utf-8")
+#     query = (
+#         'SELECT id AS "ID", indirizzo AS "Indirizzo", piano AS "Piano",'
+#         ' nome_strumento AS "Nome Strumentazione", responsabile_strumento AS "Responsabile",'
+#         ' codice_sipi_torino AS "Codice SIPI Torino", codice_sipi_grugliasco AS "Codice SIPI Grugliasco",'
+#         'categoria AS "Categoria", '
+#         "(peso = '' OR peso ~ '^-?[0-9]+(\.[0-9]+)?$')  AS peso_numeric, "
+#         "(dimensioni = '' OR dimensioni ~ '^[0-9]+x[0-9]+x[0-9]+$') AS dimensioni_ok " 
+#         "FROM inventario WHERE deleted IS NULL " 
+#         "AND indirizzo ILIKE '%ungheria%' or indirizzo ilike '%fisica%'"
+#         )
+#     query += " ORDER BY id ASC"
+#     sql = text(query)
+#     with engine.connect() as conn:
+#         result = conn.execute(sql)
+#         records = result.fetchall()
+#         keys = result.keys()
+#     return render_template(
+#         "search.html",
+#         records=records,
+#         request_args=request.args,
+#         fields=fields,
+#         query_string=query_string,
+#         boolean_fields=BOOLEAN_FIELDS,
+#         columns=keys,
+#     )
 
 
 @app.route(APP_ROOT + "/search_resp")
@@ -1074,7 +1044,7 @@ def search_resp():
             )
         )
         resp = result.fetchall()
-    print('resp', resp)
+    #print('resp', resp)
     return render_template(
         "search_responsabile.html",
         resp=resp,
@@ -1095,6 +1065,23 @@ def search_sipi_torino():
         "search_sipi_torino.html",
         sipi_list=sipi_list,
     )
+
+@app.route(APP_ROOT + "/search_sipi_grugliasco")
+# @check_login
+def search_sipi_grugliasco():
+    with engine.connect() as conn:
+        result = conn.execute(
+            text(
+                "( SELECT DISTINCT codice_sipi_grugliasco FROM inventario WHERE codice_sipi_grugliasco != '') ORDER BY codice_sipi_grugliasco"
+            )
+        )
+        sipi_list = result.fetchall()
+
+    return render_template(
+        "search_sipi_grugliasco.html",
+        sipi_list=sipi_list,
+    )
+
 
 @app.route(APP_ROOT + "/search_struttura")
 # @check_login
