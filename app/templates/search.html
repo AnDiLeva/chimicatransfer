@@ -37,12 +37,15 @@
 {% if field == 'indirizzo' %}
 <select class="input" name="{{ field }}">
     <option value="" >Cerca indirizzo</option>
+    <option value="Via Pietro Giuria 01" >Via Pietro Giuria 1</option>
     <option value="Via Pietro Giuria 5" >Via Pietro Giuria 5</option>
     <option value="Via Pietro Giuria 7" >Via Pietro Giuria 7</option>
     <option value="Via Pietro Giuria 9" >Via Pietro Giuria 9</option>
+    <option value="Via Pietro Giuria 13" >Via Pietro Giuria 13</option>
+    <option value="Via Pietro Giuria 15" >Via Pietro Giuria 15</option>
     <option value="Via Quarello 15" >Via Quarello 15</option>
     <option value="Via Bidone 36" >Via Bidone 36</option>
-    <option value="Via Pietro Giuria 13" >Via Pietro Giuria 13</option>
+
 </select>
 
 {%elif field == 'piano' %}
@@ -56,6 +59,15 @@
     <option value="6" >6</option>
     <option value="-1" >-1</option>
     <option value="-2" >-2</option>
+    <option value="FISICA" >Fisica</option>
+</select>
+{%elif field == 'categoria' %}
+<select class="input" name="{{ field }}">
+    <option value="" >Cerca per categoria</option>
+    <option value="Piccola+Strumentazione" >Piccola Strumentazione</option>
+    <option value="PC+e+materiale+informatico" >PC e materiale informatico</option>
+    <option value="Libri" >Libri</option>
+    <option value="Alta+Specializzazione" >Alta Specializzazione</option>
 </select>
 {%elif field == 'difficolta' %}
 <select class="input" name="{{ field }}">
@@ -161,7 +173,13 @@
   
   {%endif%}</td>
 <!-- <td>{{ r['ID EXCEL'] }}</td> -->
-<td>{{ r['Indirizzo'] }}</td>
+<td>
+  {% if r.Indirizzo == 'Via Pietro Giuria 01' %}<p>Via Pietro Giuria 1</p>
+  {% else%}
+{{ r['Indirizzo'] }}
+</td>
+{% endif %}
+
 <td>{{ r['Piano'] }}</td>
 <td>{{ r['Nome Strumentazione'] }}</td>
 <td>{{ r['Responsabile'] }}</td>
@@ -191,10 +209,7 @@
 {% endif %}
   {{ r['Quale difficoltà'] }}</td> -->
 
-
-
-{# <td>{{ r['Note'] }}</td> #}
-<td>{{ r['Note'].replace('\r', '<br>') | safe }}</td>
+<td>{{ r['Categoria'] }}</td>
 <td>
 <a class="button is-small is-info" href="{{ url_for('view', record_id=r['ID'], query_string=query_string) }}">dettagli</a>
 

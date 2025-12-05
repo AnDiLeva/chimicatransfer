@@ -83,7 +83,8 @@ with engine.connect() as conn:
             difficolta TEXT,
             quale_difficolta TEXT,
             codice_sipi_grugliasco TEXT,
-            note TEXT
+            note TEXT,
+            categoria TEXT
         )
     """)
     )
@@ -180,7 +181,7 @@ def tutti():
                 'delicatezza AS "Delicatezza", '
                 'difficolta, quale_difficolta AS "Quale difficoltà", '
                 'codice_sipi_grugliasco AS "Simil Sipi Grugliasco", '
-                'note AS "Note", '
+                'categoria AS "Categoria", '
                 "(peso = '' OR peso ~ '^-?[0-9]+(\.[0-9]+)?$') AS peso_numeric, "
                 "(dimensioni = '' OR dimensioni ~ '^[0-9]+x[0-9]+x[0-9]+$') AS dimensioni_ok "
                 "FROM inventario WHERE deleted IS NULL "
@@ -226,12 +227,12 @@ def view(record_id: int, query_string: str = ""):
                 """responsabile_strumento AS "Responsabile del laboratorio/ufficio", """
                 """codice_sipi_torino AS "Codice SIPI Torino", codice_sipi_grugliasco AS "Codice SIPI Grugliasco", """
                 """collegamento_autonomia AS "Collegamento Autonomo","""
-                """ditta_collegamento AS "Ditta che si occupa del collegamento","""
+                "ditta_collegamento, "
                 """nome_strumento AS  "Nome Strumento","""
                 """delicatezza  AS "Grado di Delicatezza dello strumento","""
                 """difficolta  AS "Difficoltà","""
                 """quale_difficolta AS "Quale difficoltà", """
-                "peso, dimensioni,"
+                "peso, dimensioni, categoria, "
                 "note "
                 "FROM inventario "
                 "WHERE id = :id"
@@ -249,6 +250,7 @@ def view(record_id: int, query_string: str = ""):
         img_list = [
             x.name for x in list(Path(app.config["UPLOAD_FOLDER"]).glob("*_*.*"))
         ]
+        print("table results", record_dict)
 
     return render_template(
         "view.html", record=record_dict, query_string=query_string, img_list=img_list
@@ -871,7 +873,7 @@ def search():
         "indirizzo",
         "piano",
         "nome_strumento",
-        "note",
+        "categoria",
     ]
 
     query_string = request.query_string.decode("utf-8")
@@ -905,7 +907,7 @@ def search():
             'responsabile_strumento AS "Responsabile", '
             'codice_sipi_torino AS "Codice SIPI Torino", '
             'codice_sipi_grugliasco AS "Codice SIPI Grugliasco", '
-            'note AS "Note", '
+            'categoria AS "Categoria", '
             "(peso = '' OR peso ~ '^-?[0-9]+(\.[0-9]+)?$')  AS peso_numeric, "
             "(dimensioni = '' OR dimensioni ~ '^[0-9]+x[0-9]+x[0-9]+$') AS dimensioni_ok "
             "FROM inventario WHERE deleted IS NULL"

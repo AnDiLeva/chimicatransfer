@@ -18,7 +18,6 @@
 
 
 <!-- <a class="button is-warning" href="{{ url_for('etichetta', record_id=record.ID) }}">Stampa etichetta</a> -->
-
 </div>
 <br>
 <h1 class="title">{{ record['Nome Strumento'] }}</h1>
@@ -27,14 +26,22 @@
 <tbody>
 {% for key, value in record.items()  if key != 'Nome Strumento' %}
 <tr>
+{% if key == 'ditta_collegamento' %}
+<th>{{"Ditta che si occupa del collegamento nel caso che la ditta che si occupa del trasloco non fosse in grado"}}</th>
+{% else %}
 <th>{{ key.replace('_', ' ') }}</th>
+{% endif %}
 <td>
 {% if key == 'Responsabile del laboratorio/ufficio' %}
 <a href="/chimicatransfer/search?responsabile_strumento={{ value }}">{{ value }}</a>
 {% elif key == 'Codice SIPI Torino' %}
 <a href="/chimicatransfer/search?codice_sipi_torino={{ value }}">{{ value }}</a>
 {% else %}
+{% if value == 'Via Pietro Giuria 01' %}
+{{'Via Pietro Giuria 1'}}
+{% else %}
 {{ value }}
+{% endif %}
 {% endif %}
 </td>
 </tr>

@@ -47,7 +47,12 @@
   
   {%endif%}</td>
 <!-- <td>{{ r['ID EXCEL'] }}</td> -->
-<td>{{ r['Indirizzo'] }}</td>
+<td>
+  {% if r.Indirizzo == 'Via Pietro Giuria 01' %}<p>Via Pietro Giuria 1</p>
+  {% else%}
+{{ r['Indirizzo'] }}
+</td>
+{% endif %}
 <td>{{ r['Piano'] }}</td>
 <td>{{ r['Codice SIPI Torino'] }}</td>
 <td>{{ r['Nome Strumentazione'] }}</td>
@@ -92,9 +97,7 @@
 </td> -->
 <!-- <td>{{ r.Destinazione }}</td> -->
 
-
-{# <td>{{ r['Note'] }}</td> #}
-<td>{{ r['Note'].replace('\r', '<br>') | safe }}</td>
+<td>{{ r['Categoria'] }}</td>
 <td>
 <a class="button is-small is-info" href="{{ url_for('view', record_id=r['ID'], query_string=query_string) }}">dettagli</a>
  {% if session['email'] %}
