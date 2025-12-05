@@ -232,8 +232,7 @@ def view(record_id: int, query_string: str = ""):
                 """delicatezza  AS "Grado di Delicatezza dello strumento","""
                 """difficolta  AS "Difficoltà","""
                 """quale_difficolta AS "Quale difficoltà", """
-                "peso, dimensioni, categoria, "
-                "note "
+                "peso, dimensioni, categoria "
                 "FROM inventario "
                 "WHERE id = :id"
             )
@@ -244,7 +243,7 @@ def view(record_id: int, query_string: str = ""):
 
         record_dict = dict(result._mapping)
 
-        record_dict["note"] = Markup(record_dict["note"].replace("\r", "<br>"))
+        #record_dict["note"] = Markup(record_dict["note"].replace("\r", "<br>"))
 
         # check for images
         img_list = [
