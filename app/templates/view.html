@@ -15,6 +15,11 @@
 <div class="field is-grouped">
 
 <a href="javascript:history.back()" class="button is-link">Indietro</a>
+<a
+    class="button is-danger"
+    href="{{ url_for('etichetta', record_id=record.ID) }}"
+    >Esporta etichetta in Pdf</a
+>
 
 <!-- <a class="button is-warning" href="{{ url_for('etichetta', record_id=record.ID) }}">Stampa etichetta</a> -->
 </div>

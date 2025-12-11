@@ -124,34 +124,54 @@
 
 {# etichette multiple #}
 <br>
-<form method="post" action="{{ url_for('etichetta') }}" id="form_etichette_multiple">
-
-
-
-
-<div class="control">
-    {% if records %}
-    <!-- <button class="button is-info" type="submit" name="export" value="xlsx">Esporta in XLSX</button> -->
-    <!-- <button class="button is-info" type="submit">Stampa etichette</button> -->
-    <!--<a href="" class="button is-info" type="submit">Check</a>-->
-    {% endif %}
+<div class="field is-grouped">
+  {% if records %}
+    <form method="post" action="{{ url_for('exportxlsx') }}" id="form_xlsx_multiple">
+      <div class="control">
+          <button class="button is-primary" type="submit" name="export" value="xlsx">Esporta in XLSX</button>
+      </div>
+    </form>
+  
+    <form method="post" action="{{ url_for('etichetta') }}" id="form_etichette_multiple">
+      <div class="control">
+          <button class="button is-danger" type="submit" name="export" value="pdf">Esporta in etichetta Pdf</button>
+    </div>
+    </form>
+  {% endif %}
 </div>
 
 
-
-
-</form>
-
 <hr />
 
+<style>
+.table-container {
+  max-height: 80vh; /* oppure 100vh meno eventuali header/footer */
+  overflow-y: auto;
+}
 
+.table thead th {
+  position: sticky;
+  top: 0;
+  color: #ffffff;
+  background: #111111;
+  z-index: 2;
+}
+
+/* opzionale: bordi sopra/sotto header */
+.table thead {
+  border-bottom: 2px solid #ddd;
+}
+.emoji {
+      cursor: pointer;
+    }
+</style>
 <div class="mb-5">
 <b>{{ records|length }}</b> beni trovati<br>
 </div>
 <table class="table is-striped is-fullwidth">
 <thead>
 <tr>
-
+<th><input type="checkbox" id="select_all" /></th>
 {% for field in columns %}
 {% if field not in ['da_movimentare', 'catena_del_freddo', 'collegamento_autonomia', 'difficolta','trasporto_in_autonomia', 'microscopia', 'alta_specialistica', 'peso_numeric', 'dimensioni_ok'] %}
 
@@ -166,6 +186,7 @@
 {% for r in records %}
 <!-- {{r._fields}} -->
 <tr>
+  <td><input type="checkbox" name="record_ids" value="{{ r['ID'] }}" form="form_modifica_multipla"></td>
 <td> {{ r['ID'] }}</td>
 <td>{% if not r.peso_numeric or not r.dimensioni_ok %}
   <span class="emoji" title="Verificare il peso e/o le dimensioni">⚠️</span>
@@ -277,6 +298,71 @@ const form = this;
 
 
 </script> -->
+
+<script>
+   window.onload = function(){  
+    document.getElementById('select_all').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('input[name="record_ids"]');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+        console.log("checked all")
+    });
+
+
+
+document.getElementById('form_etichette_multiple').addEventListener('submit', function(e) {
+    const selected = document.querySelectorAll('input[name="record_ids"]:checked');
+    if (selected.length === 0) {
+        e.preventDefault();
+        alert('Seleziona almeno un record.');
+    }
+
+
+const form = this;
+
+    // Remove any previously cloned checkboxes
+    form.querySelectorAll('input[name="record_ids"]').forEach(el => el.remove());
+
+    // Clone selected checkboxes into form_etichette_multiple
+    selected.forEach(function(checkbox) {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'record_ids';
+        hiddenInput.value = checkbox.value;
+        form.appendChild(hiddenInput);
+    });
+
+
+
+});
+
+   document.getElementById('form_xlsx_multiple').addEventListener('submit', function(e) {
+    const selected = document.querySelectorAll('input[name="record_ids"]:checked');
+    if (selected.length === 0) {
+        e.preventDefault();
+        alert('Seleziona almeno un record.');
+    }
+
+
+const form = this;
+
+    // Remove any previously cloned checkboxes
+    form.querySelectorAll('input[name="record_ids"]').forEach(el => el.remove());
+
+    // Clone selected checkboxes into form_etichette_multiple
+    selected.forEach(function(checkbox) {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'record_ids';
+        hiddenInput.value = checkbox.value;
+        form.appendChild(hiddenInput);
+    });
+
+
+
+});
+
+   }
+</script>
 
 </body>
 </html>

@@ -18,7 +18,7 @@ from functools import wraps
 from io import BytesIO
 from markupsafe import Markup
 from requests_oauthlib import OAuth2Session
-from sqlalchemy import create_engine, text
+from sqlalchemy import bindparam, create_engine, text
 import pandas as pd
 import json
 import os
@@ -254,588 +254,6 @@ def view(record_id: int, query_string: str = ""):
     return render_template(
         "view.html", record=record_dict, query_string=query_string, img_list=img_list
     )
-# """SELECT id AS "ID", """
-# """responsabile_strumento AS "Responsabile del laboratorio/ufficio", """
-# """num_inventario AS "Numero di inventario", num_inventario_ateneo, data_carico,"""
-# """codice_sipi_torino AS "Codice SIPI Torino", codice_sipi_grugliasco AS "Codice SIPI Grugliasco", """
-# "CASE WHEN microscopia THEN 'SI' ELSE 'NO' END AS microscopia,"
-# """CASE WHEN catena_del_freddo THEN 'SI' ELSE 'NO' END AS "Rispettare la catena del freddo","""
-# "CASE WHEN alta_specialistica THEN 'SI' ELSE 'NO' END AS alta_specialistica,                    "
-# "CASE WHEN da_movimentare THEN 'SI' ELSE 'NO' END AS da_movimentare,"
-# "CASE WHEN trasporto_in_autonomia THEN 'SI' ELSE 'NO' END AS trasporto_in_autonomia,"
-# "CASE WHEN da_disinventariare THEN 'SI' ELSE 'NO' END AS da_disinventariare,"
-# "CASE WHEN rosso_fase_alimentazione_privilegiata THEN 'SI' ELSE 'NO' END AS rosso_fase_alimentazione_privilegiata,"
-# "CASE WHEN didattica THEN 'SI' ELSE 'NO' END AS didattica,"
-# "valore_convenzionale,"
-# "denominazione_fornitore, anno_fabbricazione, numero_seriale,"
-# "categoria_inventoriale, catalogazione_materiale_strumentazione, peso, dimensioni,"
-# "ditta_costruttrice_fornitrice, note "
-# "FROM inventario "
-# "WHERE id = :id"
-
-# # Aggiungi record
-# @app.route(APP_ROOT + "/aggiungi", methods=["GET", "POST"])
-# @app.route(APP_ROOT + "/aggiungi/", methods=["GET", "POST"])
-# @app.route(APP_ROOT + "/aggiungi/<query_string>", methods=["GET", "POST"])
-# #@check_login
-# def aggiungi(query_string: str = ""):
-#     """
-#     aggiungi bene all'inventario
-#     """
-#     if request.method == "GET":
-#         with engine.connect() as conn:
-#             responsabili = conn.execute(
-#                 text(
-#                     "SELECT DISTINCT responsabile_strumento FROM inventario WHERE deleted IS NULL ORDER BY responsabile_strumento"
-#                 )
-#             ).fetchall()
-
-#         search_responsabile = "None"
-#         if query_string:
-#             search_responsabile = query_string.split("=")[1].replace("+", " ")
-#             print(f"{search_responsabile=}")
-
-#         return render_template(
-#             "aggiungi.html",
-#             responsabili=responsabili,
-#             boolean_fields=BOOLEAN_FIELDS,
-#             query_string=query_string,
-#             search_responsabile=search_responsabile,
-#         )
-
-#     if request.method == "POST":
-#         data = dict(request.form)
-
-#         # modify values for boolean fields
-#         for field in BOOLEAN_FIELDS:
-#             value = request.form.get(field)
-#             data[field] = value == "true"
-
-#         # check for new responsabile
-#         if data["responsabile_strumento"] == "altro":
-#             data["responsabile_strumento"] = data["nuovo_responsabile_strumento"]
-
-#         query = text("""
-#             INSERT INTO inventario (
-#             quantita,
-#                  num_inventario, num_inventario_ateneo, data_carico,
-#                 descrizione_bene, codice_sipi_torino, codice_sipi_grugliasco, destinazione,
-#                 microscopia, catena_del_freddo, alta_specialistica, da_movimentare, trasporto_in_autonomia, da_disinventariare,
-#                 rosso_fase_alimentazione_privilegiata, 
-#                 didattica, valore_convenzionale, esercizio_bene_migrato,
-#                 responsabile_strumento, denominazione_fornitore, anno_fabbricazione, numero_seriale,
-#                 categoria_inventoriale, catalogazione_materiale_strumentazione, peso, dimensioni,
-#                 ditta_costruttrice_fornitrice, note
-#             ) VALUES (
-#                 :quantita, :num_inventario, :num_inventario_ateneo, :data_carico,
-#                 :descrizione_bene, :codice_sipi_torino, :codice_sipi_grugliasco, :destinazione,
-#                 :microscopia, :catena_del_freddo, :alta_specialistica, :da_movimentare, :trasporto_in_autonomia, :da_disinventariare,
-#                 :rosso_fase_alimentazione_privilegiata, :didattica, :valore_convenzionale, :esercizio_bene_migrato,
-#                 :responsabile_strumento, :denominazione_fornitore, :anno_fabbricazione, :numero_seriale,
-#                 :categoria_inventoriale, :catalogazione_materiale_strumentazione, :peso, :dimensioni,
-#                 :ditta_costruttrice_fornitrice, :note
-#             )
-#             RETURNING id
-#         """)
-#         with engine.connect() as conn:
-#             conn.execute(
-#                 text("SET LOCAL application_name = :user"), {"user": session["email"]}
-#             )
-#             new_id = conn.execute(query, data).fetchone()[0]
-#             conn.commit()
-
-#             # foto
-#             foto = request.files.get("foto")
-#             if foto and foto.filename != "":
-#                 foto.save(
-#                     Path(app.config["UPLOAD_FOLDER"])
-#                     / Path(str(new_id) + "_1").with_suffix(Path(foto.filename).suffix)
-#                 )
-
-#         if query_string:
-#             return redirect(APP_ROOT + f"/search?{query_string}")
-#         else:
-#             return redirect(url_for("index"))
-
-
-# # Modifica record - form
-# @app.route(APP_ROOT + "/modifica/<int:record_id>")
-# @app.route(APP_ROOT + "/modifica/<int:record_id>/")
-# @app.route(APP_ROOT + "/modifica/<int:record_id>/<path:query_string>")
-# @check_login
-# def modifica(record_id, query_string: str = ""):
-#     """
-#     modifica un bene
-#     """
-#     with engine.connect() as conn:
-#         result = conn.execute(
-#             text(
-#                 (
-#                     "SELECT id, quantita, descrizione_bene, responsabile_strumento, "
-#                     "num_inventario, num_inventario_ateneo, data_carico,"
-#                     "codice_sipi_torino, codice_sipi_grugliasco, destinazione,"
-#                     "CASE WHEN microscopia THEN 'SI' ELSE 'NO' END AS microscopia,"
-#                     "CASE WHEN catena_del_freddo THEN 'SI' ELSE 'NO' END AS catena_del_freddo,"
-#                     "CASE WHEN alta_specialistica THEN 'SI' ELSE 'NO' END AS alta_specialistica,                    "
-#                     "CASE WHEN da_movimentare THEN 'SI' ELSE 'NO' END AS da_movimentare,"
-#                     "CASE WHEN trasporto_in_autonomia THEN 'SI' ELSE 'NO' END AS trasporto_in_autonomia,"
-#                     "CASE WHEN da_disinventariare THEN 'SI' ELSE 'NO' END AS da_disinventariare,"
-#                     "CASE WHEN rosso_fase_alimentazione_privilegiata THEN 'SI' ELSE 'NO' END AS rosso_fase_alimentazione_privilegiata,"
-#                     "CASE WHEN didattica THEN 'SI' ELSE 'NO' END AS didattica,"
-#                     "valore_convenzionale,"
-#                     "denominazione_fornitore, anno_fabbricazione, numero_seriale,"
-#                     "categoria_inventoriale, catalogazione_materiale_strumentazione, peso, dimensioni,"
-#                     "ditta_costruttrice_fornitrice, note "
-#                     "FROM inventario "
-#                     "WHERE id = :id"
-#                 )
-#             ),
-#             {"id": record_id},
-#         )
-#         record = result.fetchone()
-
-#         responsabili = conn.execute(
-#             text(
-#                 "SELECT DISTINCT responsabile_strumento FROM inventario WHERE deleted IS NULL ORDER BY responsabile_strumento"
-#             )
-#         ).fetchall()
-
-#         # check for images
-#         img_list = [
-#             x.name for x in list(Path(app.config["UPLOAD_FOLDER"]).glob("*_*.*"))
-#         ]
-
-#     return render_template(
-#         "modifica.html",
-#         record=record,
-#         query_string=query_string,
-#         responsabili=responsabili,
-#         img_list=img_list,
-#         boolean_fields=BOOLEAN_FIELDS,
-#     )
-
-
-# # Modifica record - salvataggio
-# @app.route(APP_ROOT + "/salva_modifiche/<int:record_id>", methods=["POST"])
-# @check_login
-# def salva_modifiche(record_id):
-#     data = dict(request.form)
-
-#     for field in BOOLEAN_FIELDS:
-#         value = request.form.get(field)
-#         data[field] = value == "true"
-
-#     # check for new responsabile
-#     if data["responsabile_strumento"] == "altro":
-#         data["responsabile_strumento"] = data["nuovo_responsabile_strumento"]
-
-#     query = text(
-#         (
-#             "UPDATE inventario SET "
-#             "    quantita = :quantita, "
-#             "    descrizione_bene = :descrizione_bene, "
-#             "    responsabile_strumento = :responsabile_strumento, "
-#             "    num_inventario = :num_inventario, "
-#             "    num_inventario_ateneo = :num_inventario_ateneo, "
-#             "    data_carico = :data_carico, "
-#             "    codice_sipi_torino = :codice_sipi_torino, "
-#             "    codice_sipi_grugliasco = :codice_sipi_grugliasco, "
-#             "    destinazione = :destinazione, "
-#             "    microscopia = :microscopia, "
-#             "    catena_del_freddo = :catena_del_freddo, "
-#             "    alta_specialistica = :alta_specialistica, "
-#             "    da_movimentare = :da_movimentare, "
-#             "    trasporto_in_autonomia = :trasporto_in_autonomia, "
-#             "    da_disinventariare = :da_disinventariare, "
-#             "    rosso_fase_alimentazione_privilegiata = :rosso_fase_alimentazione_privilegiata, "
-#             "    didattica = :didattica, "
-#             "    valore_convenzionale = :valore_convenzionale, "
-#             # "    esercizio_bene_migrato = :esercizio_bene_migrato, "
-#             "    denominazione_fornitore = :denominazione_fornitore, "
-#             "    anno_fabbricazione = :anno_fabbricazione, "
-#             "    numero_seriale = :numero_seriale, "
-#             "    categoria_inventoriale = :categoria_inventoriale, "
-#             "    catalogazione_materiale_strumentazione = :catalogazione_materiale_strumentazione, "
-#             "    peso = :peso, "
-#             "    dimensioni = :dimensioni, "
-#             "    ditta_costruttrice_fornitrice = :ditta_costruttrice_fornitrice, "
-#             "    note = :note "
-#             "WHERE id = :id "
-#         )
-#     )
-#     with engine.connect() as conn:
-#         conn.execute(
-#             text("SET LOCAL application_name = :user"), {"user": session["email"]}
-#         )
-#         conn.execute(query, {**data, "id": record_id})
-#         conn.commit()
-
-#     foto = request.files.get("foto")
-#     if foto and foto.filename != "":
-#         # filename = secure_filename(foto.filename)
-#         img_list = [
-#             x.stem
-#             for x in list(Path(app.config["UPLOAD_FOLDER"]).glob(f"{record_id}_*.*"))
-#         ]
-#         if not img_list:
-#             foto.save(
-#                 Path(app.config["UPLOAD_FOLDER"])
-#                 / Path(str(record_id) + "_1").with_suffix(Path(foto.filename).suffix)
-#             )
-#         else:
-#             img_id = max([int(x.split("_")[1]) for x in img_list]) + 1
-#             foto.save(
-#                 Path(app.config["UPLOAD_FOLDER"])
-#                 / Path(str(record_id) + f"_{img_id}").with_suffix(
-#                     Path(foto.filename).suffix
-#                 )
-#             )
-
-#     query_string = request.form.get("query_string", "")
-#     if query_string == "tutti":
-#         return redirect(APP_ROOT + "/tutti")
-#     elif query_string:
-#         return redirect(APP_ROOT + f"/search?{query_string}")
-#     else:
-#         return redirect(url_for("index"))
-
-
-# # Modifica record - form
-# @app.route(APP_ROOT + "/duplica/<int:record_id>", methods=["GET", "POST"])
-# @app.route(APP_ROOT + "/duplica/<int:record_id>/", methods=["GET", "POST"])
-# @app.route(
-#     APP_ROOT + "/duplica/<int:record_id>/<path:query_string>", methods=["GET", "POST"]
-# )
-# @check_login
-# def duplica(record_id, query_string: str = ""):
-#     """
-#     duplica un bene
-#     """
-#     if request.method == "GET":
-#         with engine.connect() as conn:
-#             result = conn.execute(
-#                 text(
-#                     (
-#                         "SELECT id, descrizione_bene, responsabile_strumento FROM inventario WHERE id = :id"
-#                     )
-#                 ),
-#                 {"id": record_id},
-#             )
-#             record = result.fetchone()
-
-#         return render_template(
-#             "duplica_bene.html",
-#             record_id=record_id,
-#             record=record,
-#             query_string=query_string,
-#         )
-
-#     if request.method == "POST":
-#         copy_number = int(request.form.get("numero_copie"))
-#         with engine.connect() as conn:
-#             for i in range(1, copy_number + 1):
-#                 sql = text(
-#                     "INSERT INTO inventario ( "
-#                     "  num_inventario, "
-#                     "  num_inventario_ateneo, "
-#                     "  data_carico, "
-#                     "  descrizione_bene, "
-#                     "  codice_sipi_torino, "
-#                     "  codice_sipi_grugliasco, "
-#                     "  destinazione, "
-#                     "  rosso_fase_alimentazione_privilegiata, "
-#                     "  valore_convenzionale, "
-#                     "  esercizio_bene_migrato, "
-#                     "  responsabile_strumento, "
-#                     "  denominazione_fornitore, "
-#                     "  anno_fabbricazione, "
-#                     "  numero_seriale, "
-#                     "  categoria_inventoriale, "
-#                     "  catalogazione_materiale_strumentazione, "
-#                     "  peso, "
-#                     "  dimensioni, "
-#                     "  ditta_costruttrice_fornitrice, "
-#                     "  note, "
-#                     "  deleted, "
-#                     "  microscopia, "
-#                     "  catena_del_freddo, "
-#                     "  alta_specialistica, "
-#                     "  da_movimentare, "
-#                     "  trasporto_in_autonomia, "
-#                     "  da_disinventariare, "
-#                     "  didattica "
-#                     ") "
-#                     "SELECT "
-#                     "  num_inventario, "
-#                     "  num_inventario_ateneo, "
-#                     "  data_carico, "
-#                     f"  CONCAT(descrizione_bene, ' #', {i + 1}) , "
-#                     "  codice_sipi_torino, "
-#                     "  codice_sipi_grugliasco, "
-#                     "  destinazione, "
-#                     "  rosso_fase_alimentazione_privilegiata, "
-#                     "  valore_convenzionale, "
-#                     "  esercizio_bene_migrato, "
-#                     "  responsabile_strumento, "
-#                     "  denominazione_fornitore, "
-#                     "  anno_fabbricazione, "
-#                     "  numero_seriale, "
-#                     "  categoria_inventoriale, "
-#                     "  catalogazione_materiale_strumentazione, "
-#                     "  peso, "
-#                     "  dimensioni, "
-#                     "  ditta_costruttrice_fornitrice, "
-#                     "  note, "
-#                     "  deleted, "
-#                     "  microscopia, "
-#                     "  catena_del_freddo, "
-#                     "  alta_specialistica, "
-#                     "  da_movimentare, "
-#                     "  trasporto_in_autonomia, "
-#                     "  da_disinventariare, "
-#                     "  didattica "
-#                     "FROM inventario "
-#                     "WHERE id = :record_id "
-#                 )
-#                 conn.execute(sql, {"record_id": record_id})
-#                 conn.commit()
-
-#         flash("Bene duplicato con successo!", "success")
-
-#         return redirect(url_for("search") + "?" + query_string)
-
-
-# @app.route(APP_ROOT + "/delete_foto/<img_id>")
-# @check_login
-# def delete_foto(img_id: str):
-#     """
-#     cancella foto
-#     """
-#     record_id = img_id.split("_")[0]
-#     if (Path(app.config["UPLOAD_FOLDER"]) / img_id).exists():
-#         (Path(app.config["UPLOAD_FOLDER"]) / img_id).unlink()
-#         # record
-#         with engine.connect() as conn:
-#             conn.execute(
-#                 text(
-#                     f"INSERT INTO inventario_audit (operation_type, record_id, executed_by) VALUES ('DELETED FOTO {img_id}', :record_id, :executed_by)"
-#                 ),
-#                 {"record_id": record_id, "executed_by": session["email"]},
-#             )
-#             conn.commit()
-
-#     return redirect(f"/chimicatransfer/modifica/{record_id}")
-
-
-# @app.route(APP_ROOT + "/modifica_multipla", methods=["POST"])
-# @check_login
-# def modifica_multipla():
-#     campo = request.form.get("campo")
-#     nuovo_valore = request.form.get("nuovo_valore")
-#     record_ids = request.form.getlist("record_ids")
-#     query_string = request.form.get("query_string", "")
-
-#     if campo in (
-#         "da_movimentare",
-#         "trasporto_in_autonomia",
-#     ) and nuovo_valore.upper() not in ("SI", "NO"):
-#         flash(
-#             Markup(
-#                 f"Il valore per il campo <b>{campo.replace('_', ' ')}</b> deve essere <b>SI</b> o <b>NO</b>"
-#             ),
-#             "danger",
-#         )
-#         return redirect(url_for("search") + "?" + query_string)
-
-#     if (
-#         nuovo_valore
-#         and record_ids
-#         and campo
-#         in (
-#             "responsabile_strumento",
-#             "codice_sipi_torino",
-#             "codice_sipi_grugliasco",
-#             "da_movimentare",
-#             "trasporto_in_autonomia",
-#             "catena_del_freddo",
-#             "didattica",
-#             "destinazione",
-#             "note",
-#         )
-#     ):
-#         # set boolean values
-#         if campo in (
-#             "da_movimentare",
-#             "trasporto_in_autonomia",
-#             "catena_del_freddo",
-#             "didattica",
-#         ):
-#             nuovo_valore = nuovo_valore.upper() == "SI"
-
-#         with engine.connect() as conn:
-#             for rid in record_ids:
-#                 query = text(
-#                     f"UPDATE inventario SET {campo} = :nuovo_valore WHERE id = :id"
-#                 )
-
-#                 conn.execute(
-#                     text("SET LOCAL application_name = :user"),
-#                     {"user": session["email"]},
-#                 )
-#                 conn.execute(query, {"id": rid, "nuovo_valore": nuovo_valore})
-#                 conn.commit()
-
-#     return redirect(url_for("search") + "?" + query_string)
-
-
-# @app.route(APP_ROOT + "/upload_excel", methods=["GET", "POST"])
-# @check_login
-# def upload_excel():
-#     if request.method == "POST":
-#         file = request.files.get("file")
-#         if not file:
-#             flash("Nessun file caricato", "danger")
-#             return redirect(request.url)
-
-#         try:
-#             df = pd.read_excel(file)
-#             df.columns = df.columns.str.strip()
-
-#             excel_to_db_fields = {
-#                 "Numero inventario": "num_inventario",
-#                 "Num inventario Ateneo": "num_inventario_ateneo",
-#                 "Data carico": "data_carico",
-#                 "Descrizione bene": "descrizione_bene",
-#                 "Codice Sipi Torino": "codice_sipi_torino",
-#                 "Codice Sipi Grugliasco": "codice_sipi_grugliasco",
-#                 "Destinazione (colori legenda)": "destinazione",
-#                 "Rosso fase_alimentazione privilegiata": "rosso_fase_alimentazione_privilegiata",
-#                 "Valore convenzionale": "valore_convenzionale",
-#                 "Esercizio bene migrato": "esercizio_bene_migrato",
-#                 "Responsabile di Laboratorio": "responsabile_strumento",
-#                 "Denominazione Fornitore": "denominazione_fornitore",
-#                 "Anno fabbricazione": "anno_fabbricazione",
-#                 "Numero seriale": "numero_seriale",
-#                 "Catalogazione del materiale/strumentazione": "catalogazione_materiale_strumentazione",
-#                 "Peso": "peso",
-#                 "Dimensioni (Altezza e larghezza/lunghezza espressi in cm)": "dimensioni",
-#                 "Ditta costruttrice/Fornitrice": "ditta_costruttrice_fornitrice",
-#                 "Note": "note",
-#             }
-
-#             for col in df.columns:
-#                 if col.startswith("Peso"):
-#                     df.rename(columns={col: "Peso"}, inplace=True)
-#                     break  # Se vuoi rinominare solo la prima colonna che matcha
-
-#             """
-#             # Trasforma num_inventario in intero dove possibile
-#             df["num_inventario"] = (
-#                 pd.to_numeric(df["num_inventario"], errors="coerce")
-#                 .fillna(0)
-#                 .astype(int)
-#             )
-#             """
-
-#             # Controllo duplicati su num_inventario solo se diverso da NaN e stringa vuota
-#             """
-#             mask_validi = (df["num_inventario"].notna()) & (df["num_inventario"] != "")
-#             duplicati = df.loc[mask_validi, "num_inventario"].duplicated(keep=False)
-
-#             if duplicati.any():
-#                 num_duplicati = duplicati.sum()
-#                 inv_duplicati = df.loc[
-#                     duplicati.index[duplicati], ["num_inventario", "descrizione_bene"]
-#                 ]
-#                 elenco = "<br>".join(
-#                     f"{row['descrizione_bene']} (inv: {row['num_inventario']})"
-#                     for _, row in inv_duplicati.iterrows()
-#                 )
-#                 flash(
-#                     Markup(
-#                         f"<b>Nessun dato caricato</b> perché sono stati trovati <b>{num_duplicati} beni con numero di inventario duplicato nel file</b>:<br><br>{elenco}"
-#                     ),
-#                     "danger",
-#                 )
-
-#                 return redirect(request.url)
-#             """
-
-#             print(df.columns)
-
-#             expected_cols = list(excel_to_db_fields.keys())
-#             missing_cols = [c for c in expected_cols if c not in df.columns]
-#             if missing_cols:
-#                 flash(
-#                     Markup(
-#                         f"Mancano colonne nel file Excel:<br><b> {'<br>'.join(missing_cols)}</b>"
-#                     ),
-#                     "danger",
-#                 )
-#                 return redirect(request.url)
-
-#             # rename columns
-#             df.rename(columns=excel_to_db_fields, inplace=True)
-#             df.fillna("", inplace=True)
-
-#             # record senza responsabile
-#             senza_responsabile = df[df["responsabile_strumento"] == ""]
-
-#             #
-
-#             with engine.connect() as conn:
-#                 conn.execute(
-#                     text("SET LOCAL application_name = :user"),
-#                     {"user": session["email"]},
-#                 )
-#                 for _, row in df.iterrows():
-#                     sql = text("""
-#                     INSERT INTO inventario (
-#                          num_inventario, num_inventario_ateneo, data_carico,
-#                         descrizione_bene, codice_sipi_torino, codice_sipi_grugliasco, destinazione,
-#                         rosso_fase_alimentazione_privilegiata, valore_convenzionale, esercizio_bene_migrato,
-#                         responsabile_strumento, denominazione_fornitore, anno_fabbricazione, numero_seriale,
-#                         catalogazione_materiale_strumentazione, peso, dimensioni,
-#                         ditta_costruttrice_fornitrice, note
-#                     ) VALUES (
-#                          :num_inventario, :num_inventario_ateneo, :data_carico,
-#                         :descrizione_bene, :codice_sipi_torino, :codice_sipi_grugliasco, :destinazione,
-#                         :rosso_fase_alimentazione_privilegiata, :valore_convenzionale, :esercizio_bene_migrato,
-#                         :responsabile_strumento, :denominazione_fornitore, :anno_fabbricazione, :numero_seriale,
-#                         :catalogazione_materiale_strumentazione, :peso, :dimensioni,
-#                         :ditta_costruttrice_fornitrice, :note
-#                     )
-#                     """)
-#                     conn.execute(sql, row.to_dict())
-#                 conn.commit()
-
-#             flash("File caricato e dati inseriti con successo!", "success")
-
-#             # se ci sono record senza responsabile -> flash di report sintetico
-#             count_senza_responsabile = len(senza_responsabile)
-
-#             if count_senza_responsabile > 0:
-#                 # Prepariamo una lista di stringhe tipo "num_inventario (descrizione_bene)"
-#                 dettagli = [
-#                     f"{row['descrizione_bene']} (inv: {row['num_inventario']})"
-#                     for _, row in senza_responsabile.iterrows()
-#                 ]
-#                 inventari = "<br>".join(dettagli)
-#                 flash(
-#                     Markup(
-#                         f"<b>{count_senza_responsabile} beni senza responsabile di laboratorio</b>:<br>{inventari}"
-#                     ),
-#                     "warning",
-#                 )
-
-#             return redirect(url_for("index"))
-
-#         except Exception as e:
-#             raise
-#             flash(f"Errore nel caricamento del file: {e}", "danger")
-#             return redirect(request.url)
-
-#     return render_template("upload_excel.html")
 
 
 @app.route(APP_ROOT + "/search", methods=["GET"])
@@ -964,22 +382,7 @@ def search():
             keys = result.keys()
             # print("search keys", (keys))
             # print("search records", records[0])
-
-    # Se viene richiesta esportazione Excel e ci sono risultati
-    if request.args.get("export", "").lower() == "xlsx" and records:
-        df = pd.DataFrame(records, columns=keys)
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
-            df.to_excel(writer, index=False, sheet_name="Risultati")
-        output.seek(0)
-
-        return send_file(
-            output,
-            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            as_attachment=True,
-            download_name="risultati_ricerca.xlsx",
-        )
-
+    
     return render_template(
         "search.html",
         records=records,
@@ -989,49 +392,6 @@ def search():
         boolean_fields=BOOLEAN_FIELDS,
         columns=keys,
     )
-
-# @app.route(APP_ROOT + "/otherlocation", methods=["GET"])
-# def searchotherlocation():
-#     fields = [
-#         "responsabile_strumento",
-#         "codice_sipi_torino",
-#         "codice_sipi_grugliasco",
-#         "collegamento_autonomia",
-#         "ditta_collegamento",
-#         "delicatezza",
-#         "difficolta",
-#         "indirizzo",
-#         "piano",
-#         "nome_strumento",
-#         "categoria",
-#     ]
-#     query_string = request.query_string.decode("utf-8")
-#     query = (
-#         'SELECT id AS "ID", indirizzo AS "Indirizzo", piano AS "Piano",'
-#         ' nome_strumento AS "Nome Strumentazione", responsabile_strumento AS "Responsabile",'
-#         ' codice_sipi_torino AS "Codice SIPI Torino", codice_sipi_grugliasco AS "Codice SIPI Grugliasco",'
-#         'categoria AS "Categoria", '
-#         "(peso = '' OR peso ~ '^-?[0-9]+(\.[0-9]+)?$')  AS peso_numeric, "
-#         "(dimensioni = '' OR dimensioni ~ '^[0-9]+x[0-9]+x[0-9]+$') AS dimensioni_ok " 
-#         "FROM inventario WHERE deleted IS NULL " 
-#         "AND indirizzo ILIKE '%ungheria%' or indirizzo ilike '%fisica%'"
-#         )
-#     query += " ORDER BY id ASC"
-#     sql = text(query)
-#     with engine.connect() as conn:
-#         result = conn.execute(sql)
-#         records = result.fetchall()
-#         keys = result.keys()
-#     return render_template(
-#         "search.html",
-#         records=records,
-#         request_args=request.args,
-#         fields=fields,
-#         query_string=query_string,
-#         boolean_fields=BOOLEAN_FIELDS,
-#         columns=keys,
-#     )
-
 
 @app.route(APP_ROOT + "/search_resp")
 # @check_login
@@ -1093,7 +453,21 @@ def search_struttura():
 @app.route(APP_ROOT + "/view_qrcode/<int:record_id>")
 def view_qrcode(record_id: int):
     with engine.connect() as conn:
-        sql = text(("SELECT * FROM inventario WHERE id = :id "))
+        sql = text((
+                """SELECT id AS "ID", """
+                """indirizzo, piano,"""
+                """responsabile_strumento AS "Responsabile del laboratorio/ufficio", """
+                """codice_sipi_torino AS "Codice SIPI Torino", codice_sipi_grugliasco AS "Codice SIPI Grugliasco", """
+                """collegamento_autonomia AS "Collegamento Autonomo","""
+                "ditta_collegamento, "
+                """nome_strumento AS  "Nome Strumento","""
+                """delicatezza  AS "Grado di Delicatezza dello strumento","""
+                """difficolta  AS "Difficoltà","""
+                """quale_difficolta AS "Quale difficoltà", """
+                "peso, dimensioni, categoria "
+                "FROM inventario "
+                "WHERE id = :id"
+            ))
         result = conn.execute(sql, {"id": record_id}).fetchone()
         if not result:
             return f"Bene con ID {record_id} non trovato", 404
@@ -1114,7 +488,7 @@ def label(record_list: list) -> str:
             return f"Error in record list {', '.join(record_list)}", 404
 
         label_header = (
-            '#import "@preview/cades:0.3.0": qr-code\n'
+            '#import "@preview/cades:0.3.1": qr-code\n'
             "\n"
             "#set page(margin: (top: 1cm, bottom: 1cm, x:1cm))\n"
             "\n"
@@ -1133,9 +507,6 @@ def label(record_list: list) -> str:
             f"""#text(size: 12pt)[*`{record["nome_strumento"].replace("`", "'") if record["nome_strumento"] else " "}`*] """
         )
 
-        out.append(
-            f"""#text(size: 12pt)[*`{record["nome_strumento"].replace("`", "'") if record["nome_strumento"] else " "}`*]"""
-        )
         out.append("")
         out.append("#grid(columns: (14cm, 5cm),")
         out.append("[")
@@ -1172,12 +543,16 @@ def label(record_list: list) -> str:
         #     f"""`{"DA DISINVENTARIARE" if record["da_disinventariare"] else ""}`"""
         # )
         # out.append("")
-        out.append(
-            f"""`{"Scollegamento / Ricollegamento in autonomia" if record["collegamento_autonomia"] else ""}`"""
-        )
-        out.append(
-            f"""`{"Ditta che si occupa del collegamento" if record["ditta_collegamento"] else ""}`"""
-        )
+
+        out.append(f"`Scollegamento / Ricollegamento in autonomia:` *`{record['collegamento_autonomia']}`*,")
+        out.append("")
+        if record["collegamento_autonomia"] == "No":
+            out.append(f"`Ditta che si occupa del collegamento nel caso che la ditta che si occupa del trasloco non fosse in grado:` *`{record['ditta_collegamento']}`*,")
+        # out.append(
+        #     f"""`{"Scollegamento / Ricollegamento in autonomia" if record["collegamento_autonomia"] else ""}`"""
+        # )
+        out.append("")
+        
         # out.append("")
         # out.append(f"""`{record["destinazione"]}`""")
         out.append("")
@@ -1208,6 +583,76 @@ def label(record_list: list) -> str:
 
     return "\n".join(out)
 
+@app.route(APP_ROOT + "/exportxlsx", methods=["POST"])
+@app.route(APP_ROOT + "/exportxlsx/<int:record_id>", methods=["GET"])
+def exportxlsx(record_id: str = ""):
+    ids = request.form.getlist("record_ids")
+    label_name=''
+
+    if not ids:
+        record_list = [record_id]
+        label_name = record_list
+    else:
+        record_list = ids
+        if len(ids) == 1:
+            label_name = ids[0]
+        else:
+            label_name = 'multiple_choices'
+
+    #ids = [x[0] for x in records]
+    with engine.connect() as conn:
+        results = conn.execute(
+            text(
+                (
+        'SELECT id AS "ID", '
+        'indirizzo AS "Indirizzo", piano AS "Piano", '
+        'nome_strumento AS "Nome Strumentazione", '
+        'responsabile_strumento AS "Resp. Strumento", '
+        'codice_sipi_torino AS "Codice SIPI Attuale", '
+        'codice_sipi_grugliasco AS "Codice SIPI Grugliasco", '
+        'categoria AS "Categoria", '
+        'peso AS "Peso", '
+        'dimensioni AS "Dimensioni", '
+        'collegamento_autonomia AS "Scollegamento / Ricollegamento in autonomia?", '
+        'ditta_collegamento, '
+        'delicatezza AS "Grado di Delicatezza", '
+        'difficolta AS "Difficoltà di trasloco", '
+        'quale_difficolta AS "Se N = Si, quale difficoltà", '
+        "(dimensioni = '' OR dimensioni ~ '^[0-9]+x[0-9]+x[0-9]+$') AS dimensioni_ok "
+        "FROM inventario WHERE id IN :ids AND deleted IS NULL "
+                )
+            ).bindparams(bindparam("ids", expanding=True)),
+            {"ids": ids},
+        )
+        records = results.fetchall()
+        keys = results.keys()
+    print('keys', keys)
+    print('records', records)
+    df = pd.DataFrame(records, columns=keys)
+    #df = df.drop(columns=["peso_non_conforme", "dimensioni_non_conforme"])
+    df = df.replace({True: "SI", False: "NO"})
+    df = df.rename(columns={"ditta_collegamento":"Se K = NO, ditta che si occupa del collegamento nel caso che la ditta che si occupa del trasloco non fosse in grado"})
+    # add volume totale
+    #df["volume totale tutti beni (m³)"] = round(volume_totale, 2)
+    # add peso totale
+    #df["Peso totale tutti beni (Kg)"] = round(peso_totale, 2)
+
+    output = BytesIO()
+    spreadsheet_engine: Literal["xlsxwriter"] = (
+        "xlsxwriter"
+    )
+    with pd.ExcelWriter(output, engine=spreadsheet_engine) as writer:
+        df.to_excel(writer, index=False, sheet_name="Risultati")
+    output.seek(0)
+
+    return send_file(
+        output,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        if spreadsheet_engine == "xlsxwriter"
+        else "application/vnd.oasis.opendocument.spreadsheet",
+        as_attachment=True,
+        download_name=f"risultati_ricerca.{'xlsx' }",
+    )
 
 @app.route(APP_ROOT + "/etichetta", methods=["POST"])
 @app.route(APP_ROOT + "/etichetta/<int:record_id>", methods=["GET"])
@@ -1219,30 +664,41 @@ def etichetta(record_id: str = ""):
     """
 
     record_ids = request.form.getlist("record_ids")
+    label_name=''
 
     if not record_ids:
         record_list = [record_id]
+        label_name = record_list
     else:
         record_list = record_ids
-
+        if len(record_ids) == 1:
+            label_name = f"[{record_ids[0]}]"
+        else:
+            label_name = 'multiple_choices'
+    print(label_name)
     typst_content = label(record_list)
 
     try:
-        temp_typst_path = f"/tmp/label_{record_id}.typst"
+        # Server version
+        temp_typst_path = f"/tmp/label_{label_name}.typst"
+        temp_pdf_path = f"/tmp/label_{label_name}.pdf"
         with open(temp_typst_path, "w") as f_out:
             f_out.write(typst_content)
-
-        temp_pdf_path = f"/tmp/label_{record_id}.pdf"
-
         subprocess.run(["/usr/bin/typst", "compile", temp_typst_path, temp_pdf_path])
         
+        # # Local version
+        # temp_typst_path = f"../typst/source/label_{label_name}.typst"
+        # temp_pdf_path = f"../typst/source/label_{label_name}.pdf"
+        # with open(temp_typst_path, "w") as f_out:
+        #     f_out.write(typst_content)
+        # subprocess.run(["../typst/typst", "compile", temp_typst_path, temp_pdf_path])
 
         # send file to client
         return send_file(
             temp_pdf_path,
             mimetype="application/pdf",
             as_attachment=False,
-            download_name=f"etichetta_{record_id}.pdf",
+            download_name=f"etichetta_{label_name}.pdf",
         )
 
     finally:
