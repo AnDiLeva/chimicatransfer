@@ -544,14 +544,11 @@ def label(record_list: list) -> str:
         # )
         # out.append("")
 
-        out.append(f"`Scollegamento / Ricollegamento in autonomia:` *`{record['collegamento_autonomia']}`*,")
-        out.append("")
-        if record["collegamento_autonomia"] == "No":
-            out.append(f"`Ditta che si occupa del collegamento nel caso che la ditta che si occupa del trasloco non fosse in grado:` *`{record['ditta_collegamento']}`*,")
-        # out.append(
-        #     f"""`{"Scollegamento / Ricollegamento in autonomia" if record["collegamento_autonomia"] else ""}`"""
-        # )
-        out.append("")
+        # out.append(f"`Scollegamento / Ricollegamento in autonomia:` *`{record['collegamento_autonomia']}`*,")
+        # out.append("")
+        # if record["collegamento_autonomia"] == "No":
+        #     out.append(f"`Ditta che si occupa del collegamento nel caso che la ditta che si occupa del trasloco non fosse in grado:` *`{record['ditta_collegamento']}`*,")
+        # out.append("")
         
         # out.append("")
         # out.append(f"""`{record["destinazione"]}`""")
@@ -626,8 +623,8 @@ def exportxlsx(record_id: str = ""):
         )
         records = results.fetchall()
         keys = results.keys()
-    print('keys', keys)
-    print('records', records)
+    # print('keys', keys)
+    # print('records', records)
     df = pd.DataFrame(records, columns=keys)
     #df = df.drop(columns=["peso_non_conforme", "dimensioni_non_conforme"])
     df = df.replace({True: "SI", False: "NO"})
@@ -675,7 +672,7 @@ def etichetta(record_id: str = ""):
             label_name = f"[{record_ids[0]}]"
         else:
             label_name = 'multiple_choices'
-    print(label_name)
+    # print(label_name)
     typst_content = label(record_list)
 
     try:
