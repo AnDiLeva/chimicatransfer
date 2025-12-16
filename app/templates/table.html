@@ -74,7 +74,8 @@
 <td>
    {% if r.Delicatezza  == "1" %} <p>Non Delicato</p>
   {% elif r.Delicatezza  == "2" %}<p>Delicato</p>
-    {% else%} <p>Estremamente Delicato</p>
+    {% elif r.Delicatezza  == "3" %}<p>Estremamente Delicato</p>
+    {% else%} <p></p>
     {% endif %}
 </td>
 <td style="text-align: end;">
