@@ -651,6 +651,76 @@ def exportxlsx(record_id: str = ""):
         download_name=f"risultati_ricerca.{'xlsx' }",
     )
 
+@app.route(APP_ROOT + "/exporttotal", methods=["POST"])
+def exporttotal(record_id: str = ""):
+    ids = request.form.getlist("record_ids")
+    label_name=''
+
+    if not ids:
+        record_list = [record_id]
+        label_name = record_list
+    else:
+        record_list = ids
+        if len(ids) == 1:
+            label_name = ids[0]
+        else:
+            label_name = 'multiple_choices'
+
+    #ids = [x[0] for x in records]
+    with engine.connect() as conn:
+        results = conn.execute(
+            text(
+                (
+        'SELECT id AS "ID", '
+        'indirizzo AS "Indirizzo", piano AS "Piano", '
+        'nome_strumento AS "Nome Strumentazione", '
+        'responsabile_strumento AS "Resp. Strumento", '
+        'codice_sipi_torino AS "Codice SIPI Attuale", '
+        'codice_sipi_grugliasco AS "Codice SIPI Grugliasco", '
+        'categoria AS "Categoria", '
+        'peso AS "Peso", '
+        'dimensioni AS "Dimensioni", '
+        'collegamento_autonomia AS "Scollegamento / Ricollegamento in autonomia?", '
+        'ditta_collegamento, '
+        'delicatezza AS "Grado di Delicatezza", '
+        'difficolta AS "Difficoltà di trasloco", '
+        'quale_difficolta AS "Se N = Si, quale difficoltà", '
+        "(dimensioni = '' OR dimensioni ~ '^[0-9]+x[0-9]+x[0-9]+$') AS dimensioni_ok "
+        "FROM inventario WHERE  deleted IS NULL "
+                )
+            )
+        )
+        records = results.fetchall()
+        keys = results.keys()
+    # print('keys', keys)
+    # print('records', records)
+    df = pd.DataFrame(records, columns=keys)
+    #df = df.drop(columns=["peso_non_conforme", "dimensioni_non_conforme"])
+    df = df.replace({True: "SI", False: "NO"})
+    df = df.rename(columns={"ditta_collegamento":"Se K = NO, ditta che si occupa del collegamento nel caso che la ditta che si occupa del trasloco non fosse in grado"})
+    # add volume totale
+    #df["volume totale tutti beni (m³)"] = round(volume_totale, 2)
+    # add peso totale
+    #df["Peso totale tutti beni (Kg)"] = round(peso_totale, 2)
+
+    output = BytesIO()
+    spreadsheet_engine: Literal["xlsxwriter"] = (
+        "xlsxwriter"
+    )
+    with pd.ExcelWriter(output, engine=spreadsheet_engine) as writer:
+        df.to_excel(writer, index=False, sheet_name="Risultati")
+    output.seek(0)
+
+    return send_file(
+        output,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        if spreadsheet_engine == "xlsxwriter"
+        else "application/vnd.oasis.opendocument.spreadsheet",
+        as_attachment=True,
+        download_name=f"dotazioni_totali.{'xlsx' }",
+    )
+
+
 @app.route(APP_ROOT + "/etichetta", methods=["POST"])
 @app.route(APP_ROOT + "/etichetta/<int:record_id>", methods=["GET"])
 # @check_login

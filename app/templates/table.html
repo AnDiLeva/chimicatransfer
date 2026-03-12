@@ -23,6 +23,20 @@
 
 
 <div class="table-container">
+
+
+
+<br>
+<div class="field is-grouped">
+  
+    <form method="post" action="{{ url_for('exporttotal') }}">
+      <div class="control">
+          <button class="button is-primary" type="submit" name="export" value="xlsx">Esporta tutti in XLSX</button>
+      </div>
+    </form>
+
+</div>
+
 <table class="table is-striped is-fullwidth">
 <thead>
 <tr>
