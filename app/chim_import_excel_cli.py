@@ -23,7 +23,8 @@ excel_to_db_fields = {
     "Se si, quali": "quale_difficolta",
     "Simil-codice SIPI GRU": "codice_sipi_grugliasco",
     "Note L": "note",
-    "Categoria": "categoria"
+    "Categoria": "categoria",
+    "Gruppo": "gruppo"
 }
 # excel_to_db_fields = {
 #     "Excel_ID": "excel_id",
@@ -96,6 +97,7 @@ def upload_excel(file_path, user_email="cli_uploader"):
                     codice_sipi_grugliasco TEXT,
                     note TEXT, 
                     categoria TEXT,
+                    gruppo TEXT,
                     deleted TIMESTAMP DEFAULT NULL
                 )
             """)
@@ -115,12 +117,12 @@ def upload_excel(file_path, user_email="cli_uploader"):
                         indirizzo, piano, codice_sipi_torino,
                         nome_strumento, responsabile_strumento, dimensioni, peso,
                         collegamento_autonomia, ditta_collegamento, delicatezza,
-                        difficolta, quale_difficolta, codice_sipi_grugliasco, note, categoria
+                        difficolta, quale_difficolta, codice_sipi_grugliasco, note, categoria, gruppo
                     ) VALUES (
                         :indirizzo, :piano, :codice_sipi_torino,
                         :nome_strumento, :responsabile_strumento, :dimensioni, :peso,
                         :collegamento_autonomia, :ditta_collegamento, :delicatezza,
-                        :difficolta, :quale_difficolta, :codice_sipi_grugliasco, :note, :categoria
+                        :difficolta, :quale_difficolta, :codice_sipi_grugliasco, :note, :categoria, :gruppo
                     )
                 """)
                 conn.execute(sql, row.to_dict())

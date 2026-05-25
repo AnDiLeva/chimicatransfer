@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Visualizza Bene (ID: {{ record.id }})</title>
+<title>Visualizza Bene</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
 </head>
 <body>
@@ -32,6 +32,8 @@
 <tr>
 {% if key == 'ditta_collegamento' %}
 <th>{{"Ditta che si occupa del collegamento nel caso che la ditta che si occupa del trasloco non fosse in grado"}}</th>
+{% elif key == 'gruppo' %}
+<th>{{"Gruppo di Ricerca"}}</th>
 {% else %}
 <th>{{ key.replace('_', ' ') }}</th>
 {% endif %}
@@ -42,6 +44,18 @@
 <a href="/chimicatransfer/search?codice_sipi_torino={{ value }}">{{ value }}</a>
 {% elif key == 'Codice SIPI Grugliasco' %}
 <a href="/chimicatransfer/search?codice_sipi_grugliasco={{ value }}">{{ value }}</a>
+
+{% elif key == 'Gruppo di Ricerca' %}
+{% if value == 'CEA + CARTIN' %}
+<a href="/chimicatransfer/search?gruppo=CEA+%2B+CARTIN">{{ value }}</a>
+{% elif value == 'FABLAB + TBM1' %}
+<a href="/chimicatransfer/search?gruppo=FABLAB+%2B+TBM1">{{ value }}</a>
+{% elif value == 'MAIN + GL' %}
+<a href="/chimicatransfer/search?gruppo=MAIN+%2B+GL">{{ value }}</a>
+{%else%}
+<a href="/chimicatransfer/search?gruppo={{ value }}">{{ value }}</a>
+{% endif %}
+
 {% else %}
 {% if value == 'Via Pietro Giuria 01' %}
 {{'Via Pietro Giuria 1'}}

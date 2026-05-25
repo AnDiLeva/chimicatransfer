@@ -84,7 +84,8 @@ with engine.connect() as conn:
             quale_difficolta TEXT,
             codice_sipi_grugliasco TEXT,
             note TEXT,
-            categoria TEXT
+            categoria TEXT,
+            gruppo TEXT
         )
     """)
     )
@@ -177,6 +178,7 @@ def tutti():
                 'codice_sipi_torino AS "Codice SIPI Torino", '
                 'nome_strumento AS "Nome Strumentazione",'
                 'responsabile_strumento AS "Responsabile", '
+                'gruppo AS "Gruppo di Ricerca", '
                 'collegamento_autonomia, ditta_collegamento AS "Ditta che si occupa del collegamento", '
                 'delicatezza AS "Delicatezza", '
                 'difficolta, quale_difficolta AS "Quale difficoltà", '
@@ -225,6 +227,7 @@ def view(record_id: int, query_string: str = ""):
                 """SELECT id AS "ID", """
                 """indirizzo, piano,"""
                 """responsabile_strumento AS "Responsabile del laboratorio/ufficio", """
+                """gruppo AS "Gruppo di Ricerca", """
                 """codice_sipi_torino AS "Codice SIPI Torino", codice_sipi_grugliasco AS "Codice SIPI Grugliasco", """
                 """collegamento_autonomia AS "Collegamento Autonomo","""
                 "ditta_collegamento, "
@@ -291,10 +294,11 @@ def search():
         "piano",
         "nome_strumento",
         "categoria",
+        "gruppo",
     ]
 
     query_string = request.query_string.decode("utf-8")
-
+    #print('querystring', query_string)
     # Controlla se almeno un parametro di ricerca è presente e non vuoto
     has_filter = any(request.args.get(field, "").strip() for field in fields)
 
@@ -303,25 +307,13 @@ def search():
         records = []
         keys = fields
     else:
-        # query = (
-        #     'SELECT id AS "ID", '
-        #     'quantita as "Quantità", '
-        #     'descrizione_bene AS "Descrizione bene", '
-        #     'responsabile_strumento AS "Responsabile Laboratorio / Ufficio", '
-        #     "da_movimentare, catena_del_freddo, trasporto_in_autonomia, microscopia, alta_specialistica, "
-        #     'codice_sipi_torino AS "Codice SIPI Torino", '
-        #     'codice_sipi_grugliasco AS "Codice SIPI Grugliasco", '
-        #     'destinazione AS "Destinazione", '
-        #     'note AS "Note", '
-        #     "(peso = '' OR peso ~ '^-?[0-9]+(\.[0-9]+)?$')  AS peso_numeric, "
-        #     "(dimensioni = '' OR dimensioni ~ '^[0-9]+x[0-9]+x[0-9]+$') AS dimensioni_ok "
-        #     "FROM inventario WHERE deleted IS NULL "
-        # )
+        #l'ordine della query influenza l'ordine delle colonne nella table di search
         query = (
             'SELECT id AS "ID", '
             'indirizzo AS "Indirizzo", piano AS "Piano", '
             'nome_strumento AS "Nome Strumentazione", '
             'responsabile_strumento AS "Responsabile", '
+            'gruppo AS "Gruppo di Ricerca", '
             'codice_sipi_torino AS "Codice SIPI Torino", '
             'codice_sipi_grugliasco AS "Codice SIPI Grugliasco", '
             'categoria AS "Categoria", '
@@ -363,13 +355,17 @@ def search():
                         if field == "codice_sipi_grugliasco":
                             query += f" AND ({field} = '' OR {field} IS NULL)"
                             continue
+                        # permette di visualizzare gli elementi con casella vuota
+                        if field == "gruppo":
+                            query += f" AND ({field} = '' OR {field} IS NULL)"
+                            continue
 
                     # Per testo, ricerca con ILIKE e wildcard %
                     # if field == "piano":
                     #     query += f" AND {field} = :{field}"
                     # else:
                     query += f" AND {field} ILIKE :{field}"
-                    #print(request.args.get(field))
+                    #print('request.args.get(field)',request.args.get(field))
                     params[field] = f"%{value}%"
 
         query += " ORDER BY id ASC"
@@ -380,8 +376,8 @@ def search():
             result = conn.execute(sql, params)
             records = result.fetchall()
             keys = result.keys()
-            # print("search keys", (keys))
-            # print("search records", records[0])
+            #print("search keys", (keys))
+            #print("search records", records[0])
     
     return render_template(
         "search.html",
@@ -407,6 +403,22 @@ def search_resp():
     return render_template(
         "search_responsabile.html",
         resp=resp,
+    )
+
+@app.route(APP_ROOT + "/search_group")
+# @check_login
+def search_group():
+    with engine.connect() as conn:
+        result = conn.execute(
+            text(
+                "( SELECT DISTINCT ON (LOWER(gruppo)) gruppo from inventario WHERE gruppo != '') ORDER by LOWER(gruppo)"
+            )
+        )
+        group = result.fetchall()
+    #print('resp', resp)
+    return render_template(
+        "search_gruppo.html",
+        group=group,
     )
 
 @app.route(APP_ROOT + "/search_sipi_torino")
@@ -457,6 +469,7 @@ def view_qrcode(record_id: int):
                 """SELECT id AS "ID", """
                 """indirizzo, piano,"""
                 """responsabile_strumento AS "Responsabile del laboratorio/ufficio", """
+                """gruppo AS "Gruppo di Ricerca", """
                 """codice_sipi_torino AS "Codice SIPI Torino", codice_sipi_grugliasco AS "Codice SIPI Grugliasco", """
                 """collegamento_autonomia AS "Collegamento Autonomo","""
                 "ditta_collegamento, "
@@ -514,6 +527,12 @@ def label(record_list: list) -> str:
             out.append(f"`Responsabile lab:` *`{record['responsabile_strumento']}`*")
         else:
             out.append("*`SENZA RESPONSABILE`*")
+        out.append("")
+
+        if record["gruppo"]:
+            out.append(f"`Gruppo di Ricerca:` *`{record['gruppo']}`*")
+        else:
+            out.append("*`SENZA GRUPPO DI RICERCA ASSOCIATO`*")
         out.append("")
 
         out.append("#grid(columns: (7cm, 7cm),")
@@ -608,6 +627,7 @@ def exportxlsx(record_id: str = ""):
         'codice_sipi_torino AS "Codice SIPI Attuale", '
         'codice_sipi_grugliasco AS "Codice SIPI Grugliasco", '
         'categoria AS "Categoria", '
+        'gruppo AS "Gruppo di Ricerca", '
         'peso AS "Peso", '
         'dimensioni AS "Dimensioni", '
         'collegamento_autonomia AS "Scollegamento / Ricollegamento in autonomia?", '
@@ -678,6 +698,7 @@ def exporttotal(record_id: str = ""):
         'codice_sipi_torino AS "Codice SIPI Attuale", '
         'codice_sipi_grugliasco AS "Codice SIPI Grugliasco", '
         'categoria AS "Categoria", '
+        'gruppo AS "Gruppo di Ricerca", '
         'peso AS "Peso", '
         'dimensioni AS "Dimensioni", '
         'collegamento_autonomia AS "Scollegamento / Ricollegamento in autonomia?", '

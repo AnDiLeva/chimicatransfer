@@ -71,6 +71,27 @@
     <option value="Libri" >Libri</option>
     <option value="Alta Specializzazione" >Alta Specializzazione</option>
 </select>
+{%elif field == 'gruppo' %}
+<select class="input" name="{{ field }}">
+    <option value="" >Cerca per gruppo di ricerca</option>
+    <option value="AMAMASA" >AMAMASA</option>
+    <option value="CEA + CARTIN" >CEA + CARTIN</option>
+    <option value="DIDATTICA" >DIDATTICA</option>
+    <option value="EPR" >EPR</option>
+    <option value="FABLAB + TBM1" >FABLAB + TBM1</option>
+    <option value="GZ" >GZ</option>
+    <option value="MAIN + GL" >MAIN + GL</option>
+    <option value="MEDESP" >MEDESP</option>
+    <option value="MET" >MET</option>
+    <option value="MOF" >MOF</option>
+    <option value="MP" >MP</option>
+    <option value="NMR" >NMR</option>
+    <option value="SMCO" >SMCO</option>
+    <option value="SURFIN" >SURFIN</option>
+    <option value="TBM2" >TBM2</option>
+    <option value="TEO" >TEO</option>
+    <option value="TEO - ORG" >TEO - ORG</option>
+</select>
 {%elif field == 'difficolta' %}
 <select class="input" name="{{ field }}">
     <option value="" >Difficoltà di trasloco</option>
@@ -205,6 +226,7 @@
 <td>{{ r['Piano'] }}</td>
 <td>{{ r['Nome Strumentazione'] }}</td>
 <td>{{ r['Responsabile'] }}</td>
+<td>{{ r['Gruppo di Ricerca'] }}</td>
 <td>{{ r['Codice SIPI Torino'] }}</td>
 <td>{{ r['Codice SIPI Grugliasco'] }}</td>
 

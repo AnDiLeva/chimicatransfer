@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<title>Ricerca Inventario per gruppo di ricerca</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css" />
+</head>
+<body>
+<section class="section">
+
+  {% include "menu.html" %}
+
+  <div class="container">
+
+
+<br><br>
+
+<h1 class="title is-4">Filtra per Gruppo di Ricerca</h1>
+
+
+<div class="content">
+<ul>
+
+<li><a href="/chimicatransfer/search?gruppo=SENZA">Senza gruppo</a></li>
+<br>
+
+{% for r in group %}
+{% if r.gruppo == 'CEA + CARTIN' %}
+<li><a href="/chimicatransfer/search?gruppo=CEA+%2B+CARTIN">{{ r.gruppo }}</a></li>
+{% elif r.gruppo == 'FABLAB + TBM1' %}
+<li><a href="/chimicatransfer/search?gruppo=FABLAB+%2B+TBM1">{{ r.gruppo }}</a></li>
+{% elif r.gruppo == 'MAIN + GL' %}
+<li><a href="/chimicatransfer/search?gruppo=MAIN+%2B+GL">{{ r.gruppo }}</a></li>
+{%else%}
+<li><a href="/chimicatransfer/search?gruppo={{ r.gruppo }}">{{ r.gruppo }}</a></li>
+{% endif %}
+{% endfor %}
+</ul>
+</div>
+
+{#<!--
+<form method="get" action="/chimicatransfer/search">
+  <div class="field">
+    <label class="label">Responsabile Laboratorio</label>
+    <div class="control">
+      <div class="select">
+        <select name="responsabile_laboratorio"  onchange="this.form.submit()">
+          <option value="SENZA">Senza responsabile</option>
+          {% for r in resp %}
+          <option value="{{ r.responsabile_laboratorio }}">{{ r.responsabile_laboratorio }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="control">
+    <button type="submit" class="button is-link">Filtra</button>
+  </div>
+</form>
+-->#}
+
+</div>
+</section>
+</body>
+</html>
