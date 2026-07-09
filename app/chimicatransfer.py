@@ -157,7 +157,6 @@ def index():
     return render_template(
         "index.html",
         n_records=n_beni,
-        n_beni_senza_responsabile=0,
     )
 
 
@@ -198,20 +197,6 @@ def tutti():
         query_string="tutti",
         columns=result.keys(),
     )
-                # 'SELECT id AS "ID", '
-                # 'quantita as "Quantità", '
-                # 'descrizione_bene AS "Descrizione bene", '
-                # 'responsabile_strumento AS "Responsabile Laboratorio / Ufficio", '
-                # "da_movimentare, catena_del_freddo, trasporto_in_autonomia, microscopia, alta_specialistica, "
-                # 'codice_sipi_torino AS "Codice SIPI Torino", '
-                # 'codice_sipi_grugliasco AS "Codice SIPI Grugliasco", '
-                # 'destinazione AS "Destinazione", '
-                # 'note AS "Note", '
-                # "(peso = '' OR peso ~ '^-?[0-9]+(\.[0-9]+)?$') AS peso_numeric, "
-                # "(dimensioni = '' OR dimensioni ~ '^[0-9]+x[0-9]+x[0-9]+$') AS dimensioni_ok "
-                # "FROM inventario WHERE deleted IS NULL "
-                # "ORDER BY responsabile_strumento, descrizione_bene, id "
-                
 
 @app.route(APP_ROOT + "/view/<int:record_id>")
 @app.route(APP_ROOT + "/view/<int:record_id>/")

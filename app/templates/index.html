@@ -11,93 +11,9 @@
 <div class="container">
 
 <p class="subtitle is-5">Numero totale dei beni inseriti nel database: <b>{{ n_records }}</b></p>
-<!-- {% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-  {% for category, message in messages %}
-    <div class="notification is-{{ category }}">
-      {{ message }}
-    </div>
-  {% endfor %}
-{% endif %}
-{% endwith %} -->
-
-<!-- {% if session['email'] %} -->
-<br>
-<!-- <h4 class="subtitle is-4">Ciao {{ session['name'] }}</h4> -->
-
-
-
-
-
-<!-- 
-<div class="block">
-<p class="subtitle is-5">Numero totale dei beni inseriti nel database: <b>{{ n_records }}</b></p>
-<p class="subtitle is-5">Numero totale dei beni senza responsabile: <a href="{{ url_for("search", responsabile_laboratorio='SENZA')}}"><b>{{ n_beni_senza_responsabile }}</b></a></p>
-</div>
-
-<div class="block">
-<a class="button is-link" href="https://pad.cisti.org/p/dbios_togru">Spazio di discussione</a>
-</div>
-
-<div class="block">
-Storico del servizio
-<pre>
-
-2025-09-26: risolto problema di visualizzazione per responsabili contenenti il carattere slash (/) 
-
-2025-09-15: aggiunto id TOGRU alle etichette (come identificatore univoco)
-
-2025-07-16: aggiunto possibilità di creare copie di un bene
-
-2025-07-11: aggiunto possibilità di aggiungere una o più fotografie
-
-2025-07-10: aggiunte mappe Grugliasco
-
-2025-07-09: aggiunta opzione per stampa di etichette multiple
-
-2025-07-08: aggiunta funzione per filtrare per struttura
-                aggiunta Modifica multipla per "Catena del freddo"
-
-2025-06-09: aggiunto una sezione mappe (con codici SIPI)
-
-</pre>
-</div>
-   -->
-
-
-<!-- {% endif %} -->
-
-
-
-
 </div>
 </section>
-<!--
-    <script>
-  // Au chargement de la page
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme) {
-  body.classList.remove('light-mode', 'dark-mode');
-  body.classList.add(savedTheme);
-  toggleButton.textContent = savedTheme === 'dark-mode' ? '☀️ Mode clair' : '🌙 Mode sombre';
-}
 
-// Lors du clic sur le bouton
-toggleButton.addEventListener('click', () => {
-  if (body.classList.contains('light-mode')) {
-    body.classList.remove('light-mode');
-    body.classList.add('dark-mode');
-    toggleButton.textContent = '☀️ Mode clair';
-    localStorage.setItem('theme', 'dark-mode');
-  } else {
-    body.classList.remove('dark-mode');
-    body.classList.add('light-mode');
-    toggleButton.textContent = '🌙 Mode sombre';
-    localStorage.setItem('theme', 'light-mode');
-  }
-});
-</script>
--->
 </body>
 </html>
 
